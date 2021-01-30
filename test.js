@@ -8,40 +8,51 @@ console.log("Needed to pass", needToPass)
 let systemChecksRemaining = (totalSystemChecks - systemChecksCompleted)
 console.log("System checks remaining", systemChecksRemaining)
 
-let arrayMostlyOnes = [1, 2, 3]
-let arrayMostlyTwos = [2, 1, 3]
-let arrayMostlyThrees = [3, 2, 1]
+let remainingSysChkArray = []
+for (let i = 1; i <= systemChecksRemaining; i++) {
+    remainingSysChkArray.push(1)
+}
 
-function combine(array, sum) {
-    function c(left, right, sum) {
-        if (!sum) {
-            result = right;
-            return true;
-        }
-        return left.some(function (a, i, aa) {
-            return a <= sum && c(aa.slice(i + (a > sum - a)), right.concat(a), sum - a);
-        });
+let j = 0
+let incrementFunction = (array) => {
+    if ( needToPass <= systemChecksRemaining || needToPass > systemChecksRemaining * 3 ) {
+        return false
+    } else if ( array.reduce((a, b) => a + b, 0) === needToPass ) {
+        //console.log(remainingSysChkArray.reduce((a, b) => a + b, 0))
+        return true
+    } else if (array[j] === 3) {
+        j++
+        incrementFunction(array)
+    } else {
+        array[j] += 1
+        j++
+        incrementFunction(array)
     }
-    var result = [];
-    c(array.sort(function (a, b) { return b - a; }), [], sum);
-    return result;
-}
-function makeOutputs(needToPass, array) {
-    return combine(array, needToPass);   
-}
-if (makeOutputs(needToPass, arrayMostlyThrees).length <= systemChecksRemaining) {
-    console.log("Mostly threes: " + makeOutputs(needToPass, arrayMostlyThrees))
-}
-if (makeOutputs(needToPass, arrayMostlyTwos).length <= systemChecksRemaining) {
-    console.log("Mostly twos: " +makeOutputs(needToPass, arrayMostlyTwos))
-}
-if (makeOutputs(needToPass, arrayMostlyOnes).length <= systemChecksRemaining) {
-    console.log("Mostly ones: " + makeOutputs(needToPass, arrayMostlyOnes))
 }
 
-//how to write a function to display 
-//Exceeds : number of times 3 appears in index,
-//Meets : number of times 2 appears in index,
-//Retake : number of times 1 appears in index
+incrementFunction(remainingSysChkArray)
 
-//list all combinations?
+let tallyFunction = (array) => {
+    let tallyArray = []
+    let ones = array.filter((number) => {
+        return number === 1
+    })
+    let twos = array.filter((number) => {
+        return number === 2
+    })
+    let threes = array.filter((number) => {
+        return number === 3
+    })
+    tallyArray.push(ones.length, twos.length, threes.length)
+    return tallyArray
+}
+
+tallyScoresNeeded = tallyFunction(remainingSysChkArray)
+
+if ( needToPass <= systemChecksRemaining ) {
+    console.log(`You need to get ONE (makeup point) for ${needToPass} of the remaining ${systemChecksRemaining} system checks.`)
+} else if ( needToPass > systemChecksRemaining * 3 ) {
+    console.log(`You need ${needToPass} more points to pass which cannot be achieved in the remaining ${systemChecksRemaining} system checks.`)
+} else {
+    console.log(`The minimum scores you need to pass are: ${tallyScoresNeeded[0]} ONES (makeup), ${tallyScoresNeeded[1]} TWOS (meets expectations) and ${tallyScoresNeeded[2]} THREES (exceeds expectations)`)
+}
